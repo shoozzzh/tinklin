@@ -124,13 +124,28 @@ local comp_xform_mt = {
 
 ---@param entity_id entity_id
 ---@return entity_xform
+---@deprecated
 function xform.from_entity(entity_id)
+    return xform.of_entity(entity_id)
+end
+
+---@param entity_id entity_id
+---@return entity_xform
+function xform.of_entity(entity_id)
     return setmetatable({ entity_id = entity_id }, entity_xform_mt)
 end
 
 ---@param comp_id comp_id
----@return entity_xform
+---@return comp_xform
+---@deprecated
 function xform.from_comp(comp_id)
+    return xform.of_comp(comp_id)
+end
+
+---View the "Transform" property of a comp(if it has).
+---@param comp_id comp_id
+---@return comp_xform
+function xform.of_comp(comp_id)
     return setmetatable({ comp_id = comp_id }, comp_xform_mt)
 end
 

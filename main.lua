@@ -15,11 +15,12 @@ local tinklin = {}
 ---@class entity: entity_methods
 ---@field id entity_id
 ---@field name string
----@field Transform xform
+---@field xform xform
 ---@field tag table<string,boolean>
 
 local entity_fields = {}
 
+entity_fields.name = {}
 function entity_fields.name:get()
     return EntityGetName(self.id)
 end
@@ -28,8 +29,13 @@ function entity_fields.name:set(value)
     EntitySetName(self.id, value)
 end
 
-function entity_fields.Transform:get()
-    return xform.from_entity(self.id)
+entity_fields.xform = {}
+function entity_fields.xform:get()
+    return xform.of_entity(self.id)
+end
+
+function entity_fields.xform:set(to)
+    return EntitySetTransform(self.id, unpack(to))
 end
 
 local entity_tag_mt = {}
@@ -65,11 +71,6 @@ end
 
 function entity_methods:is_alive()
     return EntityGetIsAlive(self.id)
-end
-
----Tries to immediately refresh components that calculate values based on an entity's transform.
-function entity_methods:apply_transform()
-    EntityApplyTransform(self.id, EntityGetTransform(self.id))
 end
 
 ---@param child_entity entity
@@ -188,7 +189,7 @@ function comp_fields.enabled:set(value)
 end
 
 function comp_fields.Transform:get()
-    return xform.from_comp(self.id)
+    return xform.of_comp(self.id)
 end
 
 local comp_tag_mt = {}
@@ -300,11 +301,22 @@ function tinklin.entity_cur()
 end
 
 ---@param filename string
----@param x number
----@param y number
+---@param x number? '0'
+---@param y number? '0'
 ---@return entity entity
+---@nodiscard
 function tinklin.entity_load(filename, x, y)
     return tinklin.entity_wrap(EntityLoad(filename, x, y))
+end
+
+---@param filename string
+---@param parent entity
+---@return entity entity
+function tinklin.entity_load_child(filename, parent)
+    local x, y = unpack(parent.xform.pos)
+    local entity_id = EntityLoad(filename, x, y)
+    EntityAddChild(parent.id, entity_id)
+    return tinklin.entity_wrap(entity_id)
 end
 
 ---@param name string? '""'
@@ -319,6 +331,7 @@ end
 ---@param radius number
 ---@param tag string?
 ---@return iterator<entity> entities
+---@nodiscard
 function tinklin.entity_in_radius(x, y, radius, tag)
     local entity_ids
     if tag then
@@ -333,6 +346,7 @@ end
 ---@param y number
 ---@param tag string?
 ---@return entity? entity
+---@nodiscard
 function tinklin.entity_closest(x, y, tag)
     local entity_id
     if tag then
@@ -347,6 +361,7 @@ end
 
 ---@param name string
 ---@return entity? entity
+---@nodiscard
 function tinklin.entity_with_name(name)
     local entity = EntityGetWithName(name)
     if entity ~= 0 then
@@ -356,12 +371,14 @@ end
 
 ---@param id comp_id
 ---@return component
+---@nodiscard
 function tinklin.comp_wrap(id)
     ---@type component
     return setmetatable({ id = id }, comp_mt)
 end
 
 ---@return component
+---@nodiscard
 function tinklin.comp_cur()
     return tinklin.comp_wrap(GetUpdatedComponentID())
 end
