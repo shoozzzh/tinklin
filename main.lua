@@ -8,14 +8,15 @@ end
 local fun = require "fun"
 local npair = require "npair"
 local nquadra = require "nquadra"
-local xform = require "xform"
 
 local tinklin = {}
 
 ---@class entity: entity_methods
 ---@field id entity_id
 ---@field name string
----@field xform xform
+---@field pos vector
+---@field rot vector
+---@field scale vector
 ---@field tag table<string,boolean>
 
 local entity_fields = {}
@@ -29,13 +30,37 @@ function entity_fields.name:set(value)
     EntitySetName(self.id, value)
 end
 
-entity_fields.xform = {}
-function entity_fields.xform:get()
-    return xform.of_entity(self.id)
+entity_fields.pos = {}
+function entity_fields.pos:get()
+    local x, y, _, _, _ = EntityGetTransform(self.id)
+    return npair.new { x, y }
 end
 
-function entity_fields.xform:set(to)
-    return EntitySetTransform(self.id, unpack(to))
+function entity_fields.pos:set(value)
+    local _, _, rot, scale_x, scale_y = EntityGetTransform(self.id)
+    EntitySetTransform(self.id, value[1], value[2], rot, scale_x, scale_y)
+end
+
+entity_fields.rot = {}
+function entity_fields.rot:get()
+    local _, _, rot, _, _ = EntityGetTransform(self.id)
+    return rot
+end
+
+function entity_fields.rot:set(value)
+    local x, y, _, scale_x, scale_y = EntityGetTransform(self.id)
+    EntitySetTransform(self.id, x, y, value, scale_x, scale_y)
+end
+
+entity_fields.scale = {}
+function entity_fields.scale:get()
+    local _, _, _, scale_x, scale_y = EntityGetTransform(self.id)
+    return npair.new { scale_x, scale_y }
+end
+
+function entity_fields.scale:set(value)
+    local x, y, rot, _, _ = EntityGetTransform(self.id)
+    EntitySetTransform(self.id, nil, nil, nil, value.x, value.y)
 end
 
 local entity_tag_mt = {}
@@ -188,8 +213,63 @@ function comp_fields.enabled:set(value)
     return EntitySetComponentIsEnabled(ComponentGetEntity(self.id), self.id, value)
 end
 
+local comp_xform_fields = {}
+
+function comp_xform_fields.pos:get()
+    local x, y, _, _, _ = ComponentGetValue2(self.comp_id, "Transform")
+    return npair.new { x, y }
+end
+
+function comp_xform_fields.pos:set(value)
+    local _, _, scale_x, scale_y, rot = ComponentGetValue2(self.comp_id, "Transform")
+    ComponentSetValue2(self.comp_id, "Transform", value[1], value[2], scale_x, scale_y, rot)
+end
+
+function comp_xform_fields.rot:get()
+    local _, _, _, _, rot = ComponentGetValue2(self.comp_id, "Transform")
+    return rot
+end
+
+function comp_xform_fields.rot:set(value)
+    local x, y, scale_x, scale_y, _ = ComponentGetValue2(self.comp_id, "Transform")
+    ComponentSetValue2(self.comp_id, "Transform", x, y, scale_x, scale_y, value)
+end
+
+function comp_xform_fields.scale:get()
+    local _, _, scale_x, scale_y, _ = ComponentGetValue2(self.comp_id, "Transform")
+    return npair.new { scale_x, scale_y }
+end
+
+function comp_xform_fields.scale:set(value)
+    local x, y, _, _, rot = ComponentGetValue2(self.comp_id, "Transform")
+    ComponentSetValue2(self.comp_id, "Transform", nil, nil, value.x, value.y, nil)
+end
+
+---@class comp_xform
+---@field entity_id entity_id
+local comp_xform_mt = {
+    __index = function(t, k)
+        local field = comp_xform_fields[k]
+        if field then
+            local getter = field.get
+            if getter then
+                return getter(t)
+            end
+        end
+    end,
+    __newindex = function(t, k, v)
+        local field = comp_xform_fields[k]
+        if field then
+            local setter = field.set
+            if setter then
+                return setter(t, v)
+            end
+        end
+    end,
+}
+
 function comp_fields.Transform:get()
-    return xform.of_comp(self.id)
+    return setmetatable({ comp_id = self.id }, comp_xform_mt)
 end
 
 local comp_tag_mt = {}
