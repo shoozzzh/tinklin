@@ -149,7 +149,7 @@ end
 
 function entity_methods:comps_enabled(comp_type, tag)
     if comp_type == nil then
-        return fun.iter(EntityGetAllComponents(self.id)):filter(function(c) return c.enabled end)
+        return fun.iter(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
     end
     return fun.iter(EntityGetComponentIncludingDisabled(self.id, comp_type, tag) or {}):map(tinklin.comp_wrap)
 end
@@ -393,8 +393,7 @@ end
 ---@param parent entity
 ---@return entity entity
 function tinklin.entity_load_child(filename, parent)
-    local x, y = unpack(parent.xform.pos)
-    local entity_id = EntityLoad(filename, x, y)
+    local entity_id = EntityLoad(filename, unpack(parent.pos))
     EntityAddChild(parent.id, entity_id)
     return tinklin.entity_wrap(entity_id)
 end
