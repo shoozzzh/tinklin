@@ -7,4 +7,4 @@
 
 内置了 [LuaFun](https://github.com/luafun/luafun) 和简单的向量运算封装等。
 
-使用方法见[这里。](INSTRUCTIONS.md)
+使用方法见[这里](INSTRUCTIONS.md)。
