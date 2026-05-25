@@ -1,21 +1,3 @@
-local objects = {
-    {"AbilityComponent", "gun_config", "ConfigGun"},
-    {"AbilityComponent", "gunaction_config", "ConfigGunActionInfo"},
-    {"AnimalAIComponent", "attack_melee_finish_config_explosion", "ConfigExplosion"},
-    {"DamageModelComponent", "damage_multipliers", "ConfigDamagesByType"},
-    {"DrugEffectComponent", "drug_fx_target", "ConfigDrugFx"},
-    {"DrugEffectComponent", "m_drug_fx_current", "ConfigDrugFx"},
-    {"DrugEffectModifierComponent", "fx_add", "ConfigDrugFx"},
-    {"DrugEffectModifierComponent", "fx_multiply", "ConfigDrugFx"},
-    {"ExplodeOnDamageComponent", "config_explosion", "ConfigExplosion"},
-    {"ExplosionComponent", "config_explosion", "ConfigExplosion"},
-    {"LaserEmitterComponent", "laser", "ConfigLaser"},
-    {"LightningComponent", "config_explosion", "ConfigExplosion"},
-    {"ProjectileComponent", "config", "ConfigGunActionInfo"},
-    {"ProjectileComponent", "config_explosion", "ConfigExplosion"},
-    {"ProjectileComponent", "damage_by_type", "ConfigDamagesByType"},
-    {"ProjectileComponent", "damage_critical", "ConfigDamageCritical"},
-}
 -- run this file in game
 
 local file_content = {}

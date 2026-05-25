@@ -75,6 +75,7 @@ entity_tag_mt.__newindex = function(t, k, v)
     end
 end
 
+entity_fields.tag = {}
 function entity_fields.tag:get()
     self.tag = setmetatable({ self.id }, entity_tag_mt)
     return self.tag
@@ -112,7 +113,7 @@ function entity_methods:set_parent(parent_entity)
     EntityAddChild(parent_entity.id, self.id)
 end
 
----@return entity parent_entity
+---@return entity? parent_entity
 ---@nodiscard
 function entity_methods:get_parent()
     return tinklin.entity_wrap(EntityGetParent(self.id))
@@ -122,7 +123,13 @@ end
 ---@return iterator<entity> iter_child_entity
 ---@nodiscard
 function entity_methods:get_children(tag)
-    return fun.iter(EntityGetAllChildren(self.id, tag)):map(tinklin.entity_wrap)
+    local children_ids
+    if tag == nil then
+        children_ids = EntityGetAllChildren(self.id)
+    else
+        children_ids = EntityGetAllChildren(self.id, tag)
+    end
+    return fun.iter(children_ids):map(tinklin.entity_wrap)
 end
 
 ---Returns the given entity if it has no parent, otherwise walks up the parent hierarchy to the topmost parent and returns it.
@@ -132,26 +139,62 @@ function entity_methods:get_root()
     return tinklin.entity_wrap(EntityGetRootEntity(self.id))
 end
 
+---@param comp_type component_type
+---@param tag string
+---@return component?
+---@nodiscard
 function entity_methods:comp_first(comp_type, tag)
-    return tinklin.comp_wrap(EntityGetFirstComponentIncludingDisabled(self.id, comp_type, tag))
+    local comp_id
+    if tag == nil then
+        comp_id = EntityGetFirstComponentIncludingDisabled(self.id, comp_type)
+    else
+        comp_id = EntityGetFirstComponentIncludingDisabled(self.id, comp_type, tag)
+    end
+    return tinklin.comp_wrap(comp_id)
 end
 
+---@param comp_type component_type
+---@param tag string
+---@return component?
+---@nodiscard
 function entity_methods:comp_first_enabled(comp_type, tag)
-    return tinklin.comp_wrap(EntityGetFirstComponent(self.id, comp_type, tag))
+    local comp_id
+    if tag == nil then
+        comp_id = EntityGetFirstComponent(self.id, comp_type)
+    else
+        comp_id = EntityGetFirstComponent(self.id, comp_type, tag)
+    end
+    return tinklin.comp_wrap(comp_id)
 end
 
+---@param comp_type component_type?
+---@param tag string?
+---@nodiscard
 function entity_methods:comps(comp_type, tag)
     if comp_type == nil then
         return fun.iter(EntityGetAllComponents(self.id))
     end
-    return fun.iter(EntityGetComponent(self.id, comp_type, tag) or {}):map(tinklin.comp_wrap)
+    local comps
+    if tag == nil then
+        comps = EntityGetComponent(self.id, comp_type)
+    else
+        comps = EntityGetComponent(self.id, comp_type, tag)
+    end
+    return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
 
+---@nodiscard
 function entity_methods:comps_enabled(comp_type, tag)
     if comp_type == nil then
         return fun.iter(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
     end
-    return fun.iter(EntityGetComponentIncludingDisabled(self.id, comp_type, tag) or {}):map(tinklin.comp_wrap)
+    local comps
+    if tag == nil then
+        comps = EntityGetComponentIncludingDisabled(self.id, comp_type)
+    else
+        comps = EntityGetComponentIncludingDisabled(self.id, comp_type, tag)
+    end
+    return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
 
 function entity_methods:comp_new(comp_type)
@@ -176,7 +219,7 @@ local entity_mt = {
                 return getter(t)
             end
         end
-        return entity_methods(k)
+        return entity_methods[k]
     end,
     __newindex = function(t, k, v)
         local field = entity_fields[k]
@@ -205,6 +248,7 @@ end
 
 local comp_fields = {}
 
+comp_fields.enabled = {}
 function comp_fields.enabled:get()
     return ComponentGetIsEnabled(self.id)
 end
@@ -215,6 +259,7 @@ end
 
 local comp_xform_fields = {}
 
+comp_xform_fields.pos = {}
 function comp_xform_fields.pos:get()
     local x, y, _, _, _ = ComponentGetValue2(self.comp_id, "Transform")
     return npair.new { x, y }
@@ -225,6 +270,7 @@ function comp_xform_fields.pos:set(value)
     ComponentSetValue2(self.comp_id, "Transform", value[1], value[2], scale_x, scale_y, rot)
 end
 
+comp_xform_fields.rot = {}
 function comp_xform_fields.rot:get()
     local _, _, _, _, rot = ComponentGetValue2(self.comp_id, "Transform")
     return rot
@@ -235,6 +281,7 @@ function comp_xform_fields.rot:set(value)
     ComponentSetValue2(self.comp_id, "Transform", x, y, scale_x, scale_y, value)
 end
 
+comp_xform_fields.scale = {}
 function comp_xform_fields.scale:get()
     local _, _, scale_x, scale_y, _ = ComponentGetValue2(self.comp_id, "Transform")
     return npair.new { scale_x, scale_y }
@@ -268,9 +315,12 @@ local comp_xform_mt = {
     end,
 }
 
+comp_fields.Transform = {}
 function comp_fields.Transform:get()
     return setmetatable({ comp_id = self.id }, comp_xform_mt)
 end
+
+comp_fields.tag = {}
 
 local comp_tag_mt = {}
 comp_tag_mt.__index = function(t, k)
@@ -291,10 +341,12 @@ function comp_fields.tag:get()
     return self.tag
 end
 
+comp_fields.tags = {}
 function comp_fields.tags:get()
     return ComponentGetTags(self.id)
 end
 
+comp_fields.type = {}
 function comp_fields.type:get()
     return ComponentGetTypeName(self.id)
 end
@@ -344,7 +396,7 @@ local comp_mt = {
                 return getter(t)
             end
         end
-        local method = comp_methods(k)
+        local method = comp_methods[k]
         if method then
             return method
         end
