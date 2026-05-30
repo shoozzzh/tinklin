@@ -99,6 +99,10 @@ function entity_methods:is_alive()
     return EntityGetIsAlive(self.id)
 end
 
+function entity_methods:apply_xform()
+    EntityApplyTransform(self.id, EntityGetTransform(self.id))
+end
+
 ---@param child_entity entity
 function entity_methods:add_child(child_entity)
     EntityAddChild(self.id, child_entity.id)
