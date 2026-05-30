@@ -22,8 +22,14 @@ end
 ---@param x any
 ---@param y any
 ---@return vector
-function npair.new_vec(x, y)
+function npair.new_vector(x, y)
     return new(x, y) --[[@as vector]]
+end
+
+---@return vector
+function npair.new_vector_from_polar(mag, arg)
+    ---@diagnostic disable-next-line: undefined-field
+    return new(1, 0):rotate(arg) * mag
 end
 
 ---@param min any
@@ -31,12 +37,6 @@ end
 ---@return range
 function npair.new_range(min, max)
     return new(min, max) --[[@as range]]
-end
-
----@return vector
-function npair.vec_from_polar(mag, arg)
-    ---@diagnostic disable-next-line: undefined-field
-    return new(1, 0):rotate(arg) * mag
 end
 
 function npair_mt.__unm(a)
