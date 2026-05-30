@@ -1,5 +1,3 @@
--- vesion 1.0.0
-
 local path = jit.util.funcinfo(setfenv(1, getfenv())).source:match "^.*/"
 local function require(module_name)
     return dofile_once(path .. module_name .. ".lua")
