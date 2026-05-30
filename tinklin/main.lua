@@ -9,6 +9,10 @@ local nquadra = require "nquadra"
 
 local tinklin = {}
 
+tinklin.fun = fun
+tinklin.npair = npair
+tinklin.nquadra = nquadra
+
 ---@class entity: entity_methods
 ---@field id entity_id
 ---@field name string
