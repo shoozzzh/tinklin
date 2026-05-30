@@ -95,6 +95,13 @@ function npair_mt:flip()
     return new(self[2], self[1])
 end
 
+---@param with npair
+---@param weight number
+---@return npair
+function npair_mt:lerp(with, weight)
+    return new(self[1] * weight + with[1] * (1 - weight), self[2] * weight + with[2] * (1 - weight))
+end
+
 ---@class vector: npair
 ---@field [1] number x
 ---@field [2] number y
