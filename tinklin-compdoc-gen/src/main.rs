@@ -247,7 +247,7 @@ fn main() {
     writeln!(output, "---@meta").unwrap();
     writeln!(output, "").unwrap();
     for comp in &comp_doc.0 {
-        writeln!(output, "---@class {}: component", comp.name).unwrap();
+        writeln!(output, "---@class {}: tinklin.comp", comp.name).unwrap();
         comp.fields
             .iter()
             .filter(|field| matches!(field.typ.0, TypCategory::Normal | TypCategory::ReadOnly))
