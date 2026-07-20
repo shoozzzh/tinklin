@@ -18,7 +18,7 @@ local comp = tl.comp_cur() --[[@as LuaComponent]]
 ```
 ### Get/Set component fields
 ```lua
-local proj_comp = entity.comp_first "ProjectileComponent"
+local proj_comp = entity:comp_first "ProjectileComponent"
 if not proj_comp then return end
 
 -- get/set component fields
@@ -31,11 +31,11 @@ proj_comp.set{
     damage = 4,
 }
 
-local vel_comp = entity.comp_first "VelocityComponent"
+local vel_comp = entity:comp_first "VelocityComponent"
 if vel_comp then
     -- get/set vector
     if vel_comp.mVelocity:norm() > 400 then
-        vel_comp.mVelocity = { 0, 0 }
+        vel_comp.mVelocity = tl.vec(0, 0)
     end
     -- unpack a vector(not recommended)
     local vel_x, vel_y = unpack(vel_comp.mVelocity)
@@ -59,10 +59,10 @@ local first_enabled_lua_comp = entity:comp_first_enabled "LuaComponent"
 local first_lua_comp_with_tag = entity:comp_first("LuaComponent", "enabled_in_world")
 
 -- an iterator of all components that meet the requirement(s)
-entity:comps "LuaComponent".each( function(comp) comp:remove() end )
+entity:comps "LuaComponent":each( function(comp) comp.meta:remove() end )
 
 -- if the given component type is nil, return components of any type
-entity:comps_enabled(nil, "enabled_in_hand").each( function(comp) comp.enabled = false end )
+entity:comps_enabled(nil, "enabled_in_hand"):each( function(comp) comp.meta.enabled = false end )
 ```
 ### Component operations
 ```lua
@@ -70,19 +70,18 @@ entity:comps_enabled(nil, "enabled_in_hand").each( function(comp) comp.enabled =
 local comp = entity:comp_new "LifetimeComponent" { lifetime = 1 }
 
 -- enable/disable component
-comp.enabled = false
+comp.meta.enabled = false
 
 -- remove a component
-comp:remove()
+comp.meta:remove()
 ```
 ### Tags
 ```lua
 -- toggle a tag from component
-comp.tag.enabled_in_world = true
-comp.tag.enabled_in_inventory = true
+comp.meta.tag.enabled_in_world = true
 
 -- check a tag from component
-if comp.tag.enabled_in_hand then
+if comp.meta.tag.enabled_in_hand then
     -- ...
 end
 
@@ -92,8 +91,4 @@ entity.tag.invincible = true
 if entity.tag.invincible then
     -- ...
 end
-
--- get a string formed by concatnating all tags on an entity or component, like "enabled_in_world,enabled_in_inventory"
-local comp_tags = comp.tags
-local entity_tags = entity.tags
 ```

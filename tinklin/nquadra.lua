@@ -25,20 +25,27 @@ end
 
 ---@return aabb
 function nquadra.aabb_from_ranges(range_x, range_y)
-    ---@diagnostic disable-next-line: return-type-mismatch
-    return new(range_x[1], range_x[2], range_y[1], range_y[2])
+    return new(range_x[1], range_x[2], range_y[1], range_y[2]) --[[@as aabb]]
 end
 
 ---@return aabb
-function nquadra.aabb_from_vectors(vector_min, vector_max)
-    ---@diagnostic disable-next-line: return-type-mismatch
-    return new(vector_min[1], vector_max[1], vector_min[2], vector_max[2])
+function nquadra.aabb_from_vecs(vector_min, vector_max)
+    return new(vector_min[1], vector_max[1], vector_min[2], vector_max[2]) --[[@as aabb]]
 end
 
 ---@return color
-function nquadra.color_from_hex(vector_min, vector_max)
-    ---@diagnostic disable-next-line: return-type-mismatch
-    return new(vector_min[1], vector_max[1], vector_min[2], vector_max[2])
+function nquadra.color(r, g, b, a)
+    return new(r, g, b, a) --[[@as color]]
+end
+
+---@return color
+function nquadra.color_from_hex(hexcode)
+    hexcode = hexcode:gsub("#", "")
+    local r = tonumber("0x" .. hexcode:sub(1, 2))
+    local g = tonumber("0x" .. hexcode:sub(3, 4))
+    local b = tonumber("0x" .. hexcode:sub(5, 6))
+    local a = tonumber("0x" .. hexcode:sub(7, 8))
+    return new(r, g, b, a) --[[@as color]]
 end
 
 ---@class aabb: nquadra

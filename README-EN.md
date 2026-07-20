@@ -7,4 +7,6 @@ The new generation of Noita entity and component wrappers. It offers full LSP su
 
 It also includes [LuaFun](https://github.com/luafun/luafun), simple vector operations and some more.
 
+Its type definitions assume that you're using [AutoLuaAPI](https://github.com/NathanSnail/AutoLuaAPI/)。
+
 For instructions on how to use this, [click here.](INSTRUCTIONS-EN.md)

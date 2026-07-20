@@ -116,7 +116,7 @@ static TYP_MAPPING: LazyLock<HashMap<&str, &str>> = LazyLock::new(|| {
         ("LUA_VM_TYPE::Enum", "lua_vm_type"),
         ("PROJECTILE_TYPE::Enum", "projectile_type"),
         ("MOVETOSURFACE_TYPE::Enum", "movetosurface_type"),
-        ("types::xform", "comp_xform"),
+        ("types::xform", "comp.xform"),
         ("types::aabb", "aabb"),
         ("types::iaabb", "aabb"),
         ("types::fcolor", "color"),
@@ -129,6 +129,7 @@ static TYP_MAPPING: LazyLock<HashMap<&str, &str>> = LazyLock::new(|| {
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum TypCategory {
     Normal,
+    Proxy,
     Object(String),
     ReadOnly,
     Unsupported,
@@ -148,7 +149,9 @@ impl TypCategory {
                 }
             }
             Option::Some(typ_lua) => {
-                if typ_lua.chars().any(|c| "[]<>".contains(c)) {
+                if typ_lua == "comp.xform" {
+                    (Self::Proxy, typ_lua.to_owned())
+                } else if typ_lua.chars().any(|c| "[]<>".contains(c)) {
                     (Self::ReadOnly, typ_lua.to_owned())
                 } else {
                     (Self::Normal, typ_lua.to_owned())
@@ -194,9 +197,9 @@ fn main() {
             }
             4 => {
                 let (typ, name, desc) = parse_field_line(&line);
-                cur_comp = cur_comp.map(|mut cur_comp| {
+                if let Some(ref mut cur_comp) = cur_comp {
                     let name = name.to_owned();
-                    let desc = {
+                    let mut desc = {
                         let desc = desc
                             .split_whitespace()
                             .filter_map(|s| {
@@ -220,21 +223,17 @@ fn main() {
                         }
                     };
                     let typ = TypCategory::figure_out(typ, &cur_comp.name, &name);
-                    match &typ.0 {
-                        TypCategory::Normal | TypCategory::Object(_) => {
-                            cur_comp.fields.push(Field { name, typ, desc })
-                        }
+                    match typ.0 {
                         TypCategory::ReadOnly => {
-                            let desc = "[Field is read-only]<br>".to_owned() + &desc;
-                            cur_comp.fields.push(Field { name, typ, desc })
+                            desc = "[Field is read-only]<br>".to_owned() + &desc;
                         }
                         TypCategory::Unsupported => {
                             typs_unsupported.insert(typ.1.clone());
-                            cur_comp.fields.push(Field { name, typ, desc });
                         }
+                        _ => {}
                     }
-                    cur_comp
-                });
+                    cur_comp.fields.push(Field { name, typ, desc });
+                }
             }
             other => {
                 panic!("unexpected space count: {}, at line {}", other, line_idx)
@@ -247,10 +246,15 @@ fn main() {
     writeln!(output, "---@meta").unwrap();
     writeln!(output, "").unwrap();
     for comp in &comp_doc.0 {
-        writeln!(output, "---@class {}: tinklin.comp", comp.name).unwrap();
+        writeln!(output, "---@class {}: comp", comp.name).unwrap();
         comp.fields
             .iter()
-            .filter(|field| matches!(field.typ.0, TypCategory::Normal | TypCategory::ReadOnly))
+            .filter(|field| {
+                matches!(
+                    field.typ.0,
+                    TypCategory::Normal | TypCategory::ReadOnly | TypCategory::Proxy
+                )
+            })
             .for_each(|Field { name, typ, desc }| {
                 if desc.is_empty() {
                     writeln!(output, "---@field {} {}", name, typ.1).unwrap();

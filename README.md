@@ -7,4 +7,6 @@
 
 内置了 [LuaFun](https://github.com/luafun/luafun) 和简单的向量运算封装等。
 
+类型定义默认你使用[AutoLuaAPI](https://github.com/NathanSnail/AutoLuaAPI/)。
+
 使用方法见[这里](INSTRUCTIONS.md)。
