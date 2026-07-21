@@ -28,12 +28,12 @@ function nquadra.new(value_1, value_2, value_3, value_4)
     return new(value_1, value_2, value_3, value_4)
 end
 
----@param range_x any
----@param range_y any
+---@param interval_x any
+---@param interval_y any
 ---@return aabb
 ---@nodiscard
-function nquadra.aabb_from_ranges(range_x, range_y)
-    return new(range_x[1], range_x[2], range_y[1], range_y[2]) --[[@as aabb]]
+function nquadra.aabb_from_intervals(interval_x, interval_y)
+    return new(interval_x[1], interval_x[2], interval_y[1], interval_y[2]) --[[@as aabb]]
 end
 
 ---@param vector_min vector
