@@ -164,7 +164,7 @@ function entity_methods:get_root()
 end
 
 ---@param comp_type component_type
----@param tag string
+---@param tag string?
 ---@return comp?
 ---@nodiscard
 function entity_methods:comp_first(comp_type, tag)
@@ -178,7 +178,7 @@ function entity_methods:comp_first(comp_type, tag)
 end
 
 ---@param comp_type component_type
----@param tag string
+---@param tag string?
 ---@return comp?
 ---@nodiscard
 function entity_methods:comp_first_enabled(comp_type, tag)
