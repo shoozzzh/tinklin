@@ -15,26 +15,33 @@ local function new(value_left, value_right)
     return setmetatable({ value_left, value_right }, npair_mt)
 end
 
+---@param value_left number
+---@param value_right number
+---@return npair
+---@nodiscard
 function npair.new(value_left, value_right)
     return new(value_left, value_right)
 end
 
----@param x any
----@param y any
+---@param x number
+---@param y number
 ---@return vector
+---@nodiscard
 function npair.vec(x, y)
     return new(x, y) --[[@as vector]]
 end
 
 ---@return vector
+---@nodiscard
 function npair.vec_from_polar(mag, arg)
     ---@diagnostic disable-next-line: undefined-field
     return new(1, 0):rotate(arg) * mag
 end
 
----@param min any
----@param max any
+---@param min number
+---@param max number
 ---@return range
+---@nodiscard
 function npair.range(min, max)
     return new(min, max) --[[@as range]]
 end
@@ -105,13 +112,20 @@ function npair_mt.__eq(a, b)
     return a[1] == b[1] and a[2] == b[2]
 end
 
+---@generic T
+---@param self T
+---@return T
+---@nodiscard
 function npair_mt:flip()
     return new(self[2], self[1])
 end
 
----@param with npair
+---@generic T
+---@param self T
+---@param with T
 ---@param weight number
----@return npair
+---@return T
+---@nodiscard
 function npair_mt:lerp(with, weight)
     return new(self[1] * weight + with[1] * (1 - weight), self[2] * weight + with[2] * (1 - weight))
 end
@@ -127,11 +141,17 @@ end
 ---@field lerp fun(self:vector, with:vector, weight:number): vector
 local vector_mt = {}
 
+---@param with vector
+---@return number
+---@nodiscard
 function vector_mt:dot(with)
     return self[1] * with[2] + self[1] * with[2]
 end
 
 local sin, cos, atan2, sqrt = math.sin, math.cos, math.atan2, math.sqrt
+---@param to vector?
+---@return number
+---@nodiscard
 function vector_mt:angle(to)
     if to then
         return atan2(self[2], self[1]) - atan2(to[2], to[1])
@@ -139,22 +159,31 @@ function vector_mt:angle(to)
     return atan2(self[2], self[1])
 end
 
+---@return number
+---@nodiscard
 function vector_mt:norm2()
     return self[1] ^ 2 + self[2] ^ 2
 end
 
+---@return number
+---@nodiscard
 function vector_mt:norm()
     return sqrt(self[1] ^ 2 + self[2] ^ 2)
 end
 
+---@return range
+---@nodiscard
 function vector_mt:normalize()
     local len = self:norm()
-    return new(self[1] / len, self[2] / len)
+    return new(self[1] / len, self[2] / len) --[[@as range]]
 end
 
+---@param angle number
+---@return range
+---@nodiscard
 function vector_mt:rotate(angle)
     local s, c = sin(angle), cos(angle)
-    return new(c * self[1] - s * self[2], s * self[1] + c * self[2])
+    return new(c * self[1] - s * self[2], s * self[1] + c * self[2]) --[[@as range]]
 end
 
 ---@class range
@@ -168,14 +197,24 @@ end
 ---@field lerp fun(self:vector, with:vector, weight:number): vector
 local range_mt = {}
 
+---@return number
+---@nodiscard
 function range_mt:length()
     return self[2] - self[1]
 end
 
+---@param by number
+---@param center number? 0
+---@return range
+---@nodiscard
 function range_mt:scale(by, center)
-    return new((self[1] - center) * by + center, (self[2] - center) * by + center)
+    center = center or 0
+    return new((self[1] - center) * by + center, (self[2] - center) * by + center) --[[@as range]]
 end
 
+---@param num number
+---@return boolean
+---@nodiscard
 function range_mt:contains(num)
     return self[1] <= num and num <= self[2]
 end
