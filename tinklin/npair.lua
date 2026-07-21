@@ -34,8 +34,7 @@ end
 ---@return vector
 ---@nodiscard
 function npair.vec_from_polar(mag, arg)
-    ---@diagnostic disable-next-line: undefined-field
-    return new(1, 0):rotate(arg) * mag
+    return new(1, 0) --[[@as vector]]:rotate(arg) * mag
 end
 
 ---@param min number
@@ -46,11 +45,13 @@ function npair.interval(min, max)
     return new(min, max) --[[@as interval]]
 end
 
----@param center number
----@param radius number
+---@param length number
+---@param center number?
 ---@return interval
 ---@nodiscard
-function npair.interval_from_span(center, radius)
+function npair.interval_from_span(length, center)
+    center = center or 0
+    local radius = length / 2
     return new(center - radius, center + radius) --[[@as interval]]
 end
 
@@ -179,19 +180,19 @@ function vector_mt:norm()
     return sqrt(self[1] ^ 2 + self[2] ^ 2)
 end
 
----@return interval
+---@return vector
 ---@nodiscard
 function vector_mt:normalize()
     local len = self:norm()
-    return new(self[1] / len, self[2] / len) --[[@as interval]]
+    return new(self[1] / len, self[2] / len) --[[@as vector]]
 end
 
 ---@param angle number
----@return interval
+---@return vector
 ---@nodiscard
 function vector_mt:rotate(angle)
     local s, c = sin(angle), cos(angle)
-    return new(c * self[1] - s * self[2], s * self[1] + c * self[2]) --[[@as interval]]
+    return new(c * self[1] - s * self[2], s * self[1] + c * self[2]) --[[@as vector]]
 end
 
 ---@class interval
