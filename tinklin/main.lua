@@ -153,7 +153,7 @@ function entity_methods:get_children(tag)
     else
         children_ids = EntityGetAllChildren(self.id, tag)
     end
-    return fun.iter(children_ids):map(tinklin.entity_wrap)
+    return fun.elems(children_ids):map(tinklin.entity_wrap)
 end
 
 ---Returns the given entity if it has no parent, otherwise walks up the parent hierarchy to the topmost parent and returns it.
@@ -196,7 +196,7 @@ end
 ---@nodiscard
 function entity_methods:comps(comp_type, tag)
     if comp_type == nil then
-        return fun.iter(EntityGetAllComponents(self.id))
+        return fun.elems(EntityGetAllComponents(self.id))
     end
     local comps
     if tag == nil then
@@ -204,13 +204,13 @@ function entity_methods:comps(comp_type, tag)
     else
         comps = EntityGetComponent(self.id, comp_type, tag)
     end
-    return fun.iter(comps or {}):map(tinklin.comp_wrap)
+    return fun.elems(comps or {}):map(tinklin.comp_wrap)
 end
 
 ---@nodiscard
 function entity_methods:comps_enabled(comp_type, tag)
     if comp_type == nil then
-        return fun.iter(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
+        return fun.elems(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
     end
     local comps
     if tag == nil then
@@ -218,7 +218,7 @@ function entity_methods:comps_enabled(comp_type, tag)
     else
         comps = EntityGetComponentIncludingDisabled(self.id, comp_type, tag)
     end
-    return fun.iter(comps or {}):map(tinklin.comp_wrap)
+    return fun.elems(comps or {}):map(tinklin.comp_wrap)
 end
 
 function entity_methods:comp_new(comp_type)
@@ -470,7 +470,7 @@ function tinklin.entity_in_radius(x, y, radius, tag)
     else
         entity_ids = EntityGetInRadius(x, y, radius)
     end
-    return fun.iter(entity_ids):map(tinklin.entity_wrap)
+    return fun.elems(entity_ids):map(tinklin.entity_wrap)
 end
 
 ---@param x number
