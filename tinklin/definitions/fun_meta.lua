@@ -35,6 +35,13 @@ function luafun.rands(n, m) end
 ---@generic T
 ---@param array T[]
 ---@return iterator<T>
-function luafun.iter(array) end
+function luafun.elems(array) end
 
--- no we don't need its overloads
+---@generic K, V
+---@param map {[K]: V}
+---@return multi_iterator
+function luafun.entries(map) end
+
+---@param str string
+---@return iterator<string>
+function luafun.chars(str) end
