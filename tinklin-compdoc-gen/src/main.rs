@@ -119,10 +119,10 @@ static TYP_MAPPING: LazyLock<HashMap<&str, &str>> = LazyLock::new(|| {
         ("types::xform", "comp.xform"),
         ("types::aabb", "aabb"),
         ("types::iaabb", "aabb"),
-        ("types::fcolor", "color"),
+        ("types::fcolor", "rgba_percent"),
         ("MATERIAL_VEC_DOUBLES", "table<material_id,number>"),
-        ("ValueRange", "range"),
-        ("ValueRangeInt", "range"),
+        ("ValueRange", "interval"),
+        ("ValueRangeInt", "interval"),
     ])
 });
 

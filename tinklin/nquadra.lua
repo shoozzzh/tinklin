@@ -48,14 +48,14 @@ end
 ---@param g number
 ---@param b number
 ---@param a number
----@return color
+---@return rgba_percent
 ---@nodiscard
 function nquadra.color(r, g, b, a)
-    return new(r, g, b, a) --[[@as color]]
+    return new(r, g, b, a) --[[@as rgba_percent]]
 end
 
 ---@param hexcode string
----@return color
+---@return rgba_percent
 ---@nodiscard
 function nquadra.color_from_hex(hexcode)
     hexcode = hexcode:gsub("#", "")
@@ -63,7 +63,18 @@ function nquadra.color_from_hex(hexcode)
     local g = tonumber("0x" .. hexcode:sub(3, 4))
     local b = tonumber("0x" .. hexcode:sub(5, 6))
     local a = tonumber("0x" .. hexcode:sub(7, 8))
-    return new(r, g, b, a) --[[@as color]]
+    return new(r, g, b, a) --[[@as rgba_percent]]
+end
+
+---@param abgr integer
+---@return rgba_percent
+---@nodiscard
+function nquadra.color_from_0xABGR(abgr)
+    local a = bit.rshift(abgr, 24) / 255
+    local b = bit.band(bit.rshift(abgr, 16), 255) / 255
+    local g = bit.band(bit.rshift(abgr, 8), 255) / 255
+    local r = bit.band(abgr, 255) / 255
+    return new(r, g, b, a) --[[@as rgba_percent]]
 end
 
 ---@class aabb: nquadra
@@ -74,8 +85,8 @@ end
 local aabb_mt = {}
 aabb_mt.__index = aabb_mt
 
----@return range
----@return range
+---@return interval
+---@return interval
 ---@nodiscard
 function aabb_mt:split_range()
     ---@diagnostic disable-next-line: return-type-mismatch
@@ -90,13 +101,29 @@ function aabb_mt:split_vector()
     return npair.new(self[1], self[3]), npair.new(self[2], self[4])
 end
 
----@class color: nquadra
+---@class rgba_percent: nquadra
 ---@field [1] number r
 ---@field [2] number g
 ---@field [3] number b
 ---@field [4] number a
 local color_mt = {}
 color_mt.__index = color_mt
+
+local function percent2hex(frac)
+    return math.floor(frac * 255 + 0.5)
+end
+
+---@return integer
+---@nodiscard
+function color_mt:to_0xABGR()
+    local r, g, b, a = unpack(self)
+    return bit.bor(
+        bit.lshift(percent2hex(a), 24),
+        bit.lshift(percent2hex(b), 16),
+        bit.lshift(percent2hex(g), 8),
+        percent2hex(r)
+    )
+end
 
 for k, v in pairs(aabb_mt) do
     nquadra_mt[k] = v

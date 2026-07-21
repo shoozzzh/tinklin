@@ -40,10 +40,18 @@ end
 
 ---@param min number
 ---@param max number
----@return range
+---@return interval
 ---@nodiscard
-function npair.range(min, max)
-    return new(min, max) --[[@as range]]
+function npair.interval(min, max)
+    return new(min, max) --[[@as interval]]
+end
+
+---@param center number
+---@param radius number
+---@return interval
+---@nodiscard
+function npair.interval_from_span(center, radius)
+    return new(center - radius, center + radius) --[[@as interval]]
 end
 
 function npair_mt.__unm(a)
@@ -171,58 +179,58 @@ function vector_mt:norm()
     return sqrt(self[1] ^ 2 + self[2] ^ 2)
 end
 
----@return range
+---@return interval
 ---@nodiscard
 function vector_mt:normalize()
     local len = self:norm()
-    return new(self[1] / len, self[2] / len) --[[@as range]]
+    return new(self[1] / len, self[2] / len) --[[@as interval]]
 end
 
 ---@param angle number
----@return range
+---@return interval
 ---@nodiscard
 function vector_mt:rotate(angle)
     local s, c = sin(angle), cos(angle)
-    return new(c * self[1] - s * self[2], s * self[1] + c * self[2]) --[[@as range]]
+    return new(c * self[1] - s * self[2], s * self[1] + c * self[2]) --[[@as interval]]
 end
 
----@class range
+---@class interval
 ---@field [1] number min
 ---@field [2] number max
----@operator unm(): range
----@operator add(range|number): range
----@operator sub(range|number): range
----@operator mul(range|number): range
----@operator div(range|number): range
----@field lerp fun(self:vector, with:vector, weight:number): vector
-local range_mt = {}
+---@operator unm(): interval
+---@operator add(interval|number): interval
+---@operator sub(interval|number): interval
+---@operator mul(interval|number): interval
+---@operator div(interval|number): interval
+---@field lerp fun(self:interval, with:interval, weight:number): interval
+local interval_mt = {}
 
 ---@return number
 ---@nodiscard
-function range_mt:length()
+function interval_mt:length()
     return self[2] - self[1]
 end
 
 ---@param by number
 ---@param center number? 0
----@return range
+---@return interval
 ---@nodiscard
-function range_mt:scale(by, center)
+function interval_mt:scale(by, center)
     center = center or 0
-    return new((self[1] - center) * by + center, (self[2] - center) * by + center) --[[@as range]]
+    return new((self[1] - center) * by + center, (self[2] - center) * by + center) --[[@as interval]]
 end
 
 ---@param num number
 ---@return boolean
 ---@nodiscard
-function range_mt:contains(num)
+function interval_mt:contains(num)
     return self[1] <= num and num <= self[2]
 end
 
 for k, v in pairs(vector_mt) do
     npair_mt[k] = v
 end
-for k, v in pairs(range_mt) do
+for k, v in pairs(interval_mt) do
     npair_mt[k] = v
 end
 

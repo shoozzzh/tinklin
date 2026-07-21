@@ -16,11 +16,13 @@ tinklin.nquadra = nquadra
 
 tinklin.vec = npair.vec
 tinklin.vec_from_polar = npair.vec_from_polar
-tinklin.range = npair.range
+tinklin.interval = npair.interval
+tinklin.interval_from_span = npair.interval_from_span
 tinklin.aabb_from_ranges = tinklin.nquadra.aabb_from_ranges
 tinklin.aabb_from_vecs = nquadra.aabb_from_vecs
 tinklin.color = nquadra.color
 tinklin.color_from_hex = nquadra.color_from_hex
+tinklin.color_from_0xABGR = nquadra.color_from_0xABGR
 
 local setmetatable = setmetatable
 local rawset = rawset
@@ -50,7 +52,7 @@ local entity_fields = {
     pos = {
         get = function(self)
             local x, y, _, _, _ = EntityGetTransform(self.id)
-            return npair.new { x, y }
+            return npair.new(x, y)
         end,
         set = function(self, value)
             local _, _, rot, scale_x, scale_y = EntityGetTransform(self.id)
@@ -70,7 +72,7 @@ local entity_fields = {
     scale = {
         get = function(self)
             local _, _, _, scale_x, scale_y = EntityGetTransform(self.id)
-            return npair.new { scale_x, scale_y }
+            return npair.new(scale_x, scale_y)
         end,
         set = function(self, value)
             local x, y, rot, _, _ = EntityGetTransform(self.id)
@@ -161,7 +163,7 @@ function entity_methods:get_root()
     return tinklin.entity_wrap(EntityGetRootEntity(self.id))
 end
 
----@param comp_type comp_type
+---@param comp_type component_type
 ---@param tag string
 ---@return comp?
 ---@nodiscard
@@ -175,7 +177,7 @@ function entity_methods:comp_first(comp_type, tag)
     return tinklin.comp_wrap(comp_id)
 end
 
----@param comp_type comp_type
+---@param comp_type component_type
 ---@param tag string
 ---@return comp?
 ---@nodiscard
@@ -189,7 +191,7 @@ function entity_methods:comp_first_enabled(comp_type, tag)
     return tinklin.comp_wrap(comp_id)
 end
 
----@param comp_type comp_type?
+---@param comp_type component_type?
 ---@param tag string?
 ---@nodiscard
 function entity_methods:comps(comp_type, tag)
@@ -325,7 +327,7 @@ do
         pos = {
             get = function(self)
                 local x, y, _, _, _ = ComponentGetValue2(self.comp_id, "Transform")
-                return npair.new { x, y }
+                return npair.new(x, y)
             end,
             set = function(self, value)
                 local _, _, scale_x, scale_y, rot = ComponentGetValue2(self.comp_id, "Transform")
@@ -345,7 +347,7 @@ do
         scale = {
             get = function(self)
                 local _, _, scale_x, scale_y, _ = ComponentGetValue2(self.comp_id, "Transform")
-                return npair.new { scale_x, scale_y }
+                return npair.new(scale_x, scale_y)
             end,
             set = function(self, value)
                 local x, y, _, _, rot = ComponentGetValue2(self.comp_id, "Transform")
