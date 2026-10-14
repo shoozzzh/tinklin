@@ -403,6 +403,12 @@ do
     function comp_methods:object(name)
         return setmetatable({ comp_id = self.id, name = name }, object_mt)
     end
+
+    function comp_methods:set(fields)
+        for name, value in pairs(fields) do
+            self[name] = value
+        end
+    end
 end
 
 local comp_mt = class_sim(comp_fields, comp_methods, {
