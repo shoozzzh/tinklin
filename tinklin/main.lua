@@ -223,7 +223,18 @@ end
 
 function entity_methods:comp_new(comp_type)
     return function(fields)
-        return tinklin.comp_wrap(EntityAddComponent2(self.id, comp_type, fields))
+        local fields_multival = {}
+        local fields_singleval = {}
+        for k, v in pairs(fields) do
+            if type(fields[k]) == "table" then
+                fields_multival[k] = v
+            else
+                fields_singleval[k] = v
+            end
+        end
+        local comp = tinklin.comp_wrap(EntityAddComponent2(self.id, comp_type, fields_singleval))
+        comp:set(fields_multival)
+        return comp
     end
 end
 
@@ -241,6 +252,7 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 
 ---@class comp
 ---@field meta comp.meta
+---@field set fun(self, fields: table)
 
 ---@class comp.meta
 ---@field id comp_id
