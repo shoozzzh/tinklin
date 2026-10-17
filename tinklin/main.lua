@@ -153,7 +153,7 @@ function entity_methods:get_children(tag)
     else
         children_ids = EntityGetAllChildren(self.id, tag)
     end
-    return fun.elems(children_ids):map(tinklin.entity_wrap)
+    return fun.iter(children_ids):map(tinklin.entity_wrap)
 end
 
 ---Returns the given entity if it has no parent, otherwise walks up the parent hierarchy to the topmost parent and returns it.
@@ -196,7 +196,7 @@ end
 ---@nodiscard
 function entity_methods:comps(comp_type, tag)
     if comp_type == nil then
-        return fun.elems(EntityGetAllComponents(self.id))
+        return fun.iter(EntityGetAllComponents(self.id))
     end
     local comps
     if tag == nil then
@@ -204,13 +204,13 @@ function entity_methods:comps(comp_type, tag)
     else
         comps = EntityGetComponent(self.id, comp_type, tag)
     end
-    return fun.elems(comps or {}):map(tinklin.comp_wrap)
+    return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
 
 ---@nodiscard
 function entity_methods:comps_enabled(comp_type, tag)
     if comp_type == nil then
-        return fun.elems(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
+        return fun.iter(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
     end
     local comps
     if tag == nil then
@@ -218,23 +218,12 @@ function entity_methods:comps_enabled(comp_type, tag)
     else
         comps = EntityGetComponentIncludingDisabled(self.id, comp_type, tag)
     end
-    return fun.elems(comps or {}):map(tinklin.comp_wrap)
+    return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
 
 function entity_methods:comp_new(comp_type)
     return function(fields)
-        local fields_multival = {}
-        local fields_singleval = {}
-        for k, v in pairs(fields) do
-            if type(fields[k]) == "table" then
-                fields_multival[k] = v
-            else
-                fields_singleval[k] = v
-            end
-        end
-        local comp = tinklin.comp_wrap(EntityAddComponent2(self.id, comp_type, fields_singleval))
-        comp:set(fields_multival)
-        return comp
+        return tinklin.comp_wrap(EntityAddComponent2(self.id, comp_type, fields))
     end
 end
 
@@ -252,7 +241,6 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 
 ---@class comp
 ---@field meta comp.meta
----@field set fun(self, fields: table)
 
 ---@class comp.meta
 ---@field id comp_id
@@ -415,12 +403,6 @@ do
     function comp_methods:object(name)
         return setmetatable({ comp_id = self.id, name = name }, object_mt)
     end
-
-    function comp_methods:set(fields)
-        for name, value in pairs(fields) do
-            self[name] = value
-        end
-    end
 end
 
 local comp_mt = class_sim(comp_fields, comp_methods, {
@@ -488,14 +470,14 @@ function tinklin.entity_in_radius(center, radius, tag)
     else
         entity_ids = EntityGetInRadius(x, y, radius)
     end
-    return fun.elems(entity_ids):map(tinklin.entity_wrap)
+    return fun.iter(entity_ids):map(tinklin.entity_wrap)
 end
 
 ---@param tag string
 ---@return iterator<entity> entities
 ---@nodiscard
 function tinklin.entity_tagged(tag)
-    return fun.elems(EntityGetWithTag(tag)):map(tinklin.entity_wrap)
+    return fun.iter(EntityGetWithTag(tag)):map(tinklin.entity_wrap)
 end
 
 ---@param to {[1]: number, [2]: number}
