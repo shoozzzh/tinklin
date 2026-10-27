@@ -324,8 +324,8 @@ fn main() {
         writeln!(output, "").unwrap();
     }
 
-    let mut output = create_file("comp_methods.lua");
-    let template = BufReader::new(open_file("template_comp_methods.lua"));
+    let mut output = create_file("comp_getters.lua");
+    let template = BufReader::new(open_file("template_comp_getters.lua"));
 
     for line in template.lines().map(|l| l.unwrap()) {
         if line.starts_with("--@") {
