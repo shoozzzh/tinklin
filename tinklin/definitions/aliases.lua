@@ -4,3 +4,4 @@
 --These are optional
 ---@alias entity tinklin.entity
 ---@alias vector tinklin.vector
+---@alias comp tinklin.comp

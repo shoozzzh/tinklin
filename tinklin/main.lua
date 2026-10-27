@@ -165,7 +165,7 @@ end
 
 ---@param comp_type component_type
 ---@param tag string?
----@return comp?
+---@return tinklin.comp?
 ---@nodiscard
 function entity_methods:comp_first(comp_type, tag)
     local comp_id
@@ -179,7 +179,7 @@ end
 
 ---@param comp_type component_type
 ---@param tag string?
----@return comp?
+---@return tinklin.comp?
 ---@nodiscard
 function entity_methods:comp_first_enabled(comp_type, tag)
     local comp_id
@@ -239,10 +239,10 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 ---@class tinklin.comp.layout
 ---@field _id comp_id
 
----@class comp
----@field meta comp.meta
+---@class tinklin.comp
+---@field meta tinklin.comp.meta
 
----@class comp.meta
+---@class tinklin.comp.meta
 ---@field id comp_id
 ---@field type string
 ---@field enabled boolean
@@ -254,7 +254,7 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 local comp_fields = {}
 
 do
-    ---@type table<string,{["get"]: fun(self: comp.meta): any; ["set"]: fun(self: comp.meta, value: any)?}>
+    ---@type table<string,{["get"]: fun(self: tinklin.comp.meta): any; ["set"]: fun(self: tinklin.comp.meta, value: any)?}>
     local comp_meta_fields = {
         enabled = {
             get = function(self)
@@ -512,14 +512,14 @@ function tinklin.entity_with_name(name)
 end
 
 ---@param id comp_id
----@return comp
+---@return tinklin.comp
 ---@nodiscard
 function tinklin.comp_wrap(id)
-    ---@type comp
+    ---@type tinklin.comp
     return setmetatable({ _id = id }, comp_mt)
 end
 
----@return comp
+---@return tinklin.comp
 ---@nodiscard
 function tinklin.comp_cur()
     return tinklin.comp_wrap(GetUpdatedComponentID())
