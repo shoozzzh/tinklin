@@ -337,17 +337,6 @@ fn main() {
         writeln!(output, "{}", line).unwrap();
     }
 
-    let mut output = create_file("comp_types.lua");
-
-    writeln!(output, "---@meta").unwrap();
-    writeln!(output, "").unwrap();
-    writeln!(output, "---@diagnostic disable: duplicate-doc-alias").unwrap();
-    writeln!(output, "").unwrap();
-    writeln!(output, "---@alias component_type").unwrap();
-    for comp in &comp_doc.0 {
-        writeln!(output, "---| \"{}\"", comp.name).unwrap();
-    }
-
     let mut output = create_file("fetch_object_fields.lua");
     let template = {
         let mut content = String::new();
