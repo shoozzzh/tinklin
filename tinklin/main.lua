@@ -34,9 +34,9 @@ local rawget = rawget
 ---@class tinklin.entity: tinklin.entity.methods.comp_getters, tinklin.entity.methods
 ---@field id entity_id
 ---@field name string
----@field pos vector
----@field rot vector
----@field scale vector
+---@field pos tinklin.vector
+---@field rot tinklin.vector
+---@field scale tinklin.vector
 ---@field tag table<string,boolean>
 
 ---@type table<string,{["get"]: fun(self: tinklin.entity.layout): any; ["set"]: fun(self: tinklin.entity.layout, value: any)?}>
@@ -317,9 +317,9 @@ end
 
 do
     ---@class comp.xform
-    ---@field pos vector
+    ---@field pos tinklin.vector
     ---@field rot number
-    ---@field scale vector
+    ---@field scale tinklin.vector
     ---@field comp_id comp_id
 
     ---@type table<string,{["get"]: fun(self: comp.xform): any; ["set"]: fun(self: comp.xform, value: any)?}>

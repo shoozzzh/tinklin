@@ -2,4 +2,4 @@
 ---@alias comp_id component_id
 
 ---@alias entity tinklin.entity
----@alias vector tinklin.npair.vector
+---@alias vector tinklin.vector
