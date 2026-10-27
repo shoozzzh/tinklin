@@ -1,4 +1,4 @@
--- this file is meant to test auto completion stuff
+-- this file is meant to test if the definitions works
 local tl = require "tinklin.main"
 
 local e = tl.entity_wrap(1)
