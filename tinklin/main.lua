@@ -227,6 +227,20 @@ function entity_methods:comp_new(comp_type)
     end
 end
 
+---Immediately refreshes all SpriteComponents with the given tag. Might be useful with text sprites if you want them to update more often than once a second.
+---@param tag string?
+function entity_methods:refresh_sprite(tag)
+    self:comps("SpriteComponent", tag):each(function(comp)
+        EntityRefreshSprite(self.id, comp.meta.id)
+    end)
+end
+
+---Immediately refreshes the given SpriteComponent. Might be useful with text sprites if you want them to update more often than once a second.
+---@param sprite_comp SpriteComponent
+function entity_methods:refresh_sprite_comp(sprite_comp)
+    EntityRefreshSprite(self.id, sprite_comp.meta.id)
+end
+
 ---Return value example: 'data/entities/items/flute.xml'. Incorrect value is returned if the entity has passed through the world streaming system.
 ---@return string full_path
 ---@nodiscard
