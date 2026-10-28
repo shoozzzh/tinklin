@@ -193,6 +193,7 @@ end
 
 ---@param comp_type component_type?
 ---@param tag string?
+---@return iterator<tinklin.comp>
 ---@nodiscard
 function entity_methods:comps(comp_type, tag)
     if comp_type == nil then
